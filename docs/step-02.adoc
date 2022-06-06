@@ -1,0 +1,123 @@
+== Step 2 : Use Devise to authenticate users with {login, password}
+
+=== Add Devise gem
+
+In _Gemfile_, add this line:
+
+`gem 'devise'`
+
+And run this command to install this gem:
+
+`bundle install`
+
+=== Configure Devise
+
+Next, you need to run the generator:
+
+`rails generate devise:install`
+
+At this point, a number of instructions will appear in the console. Among these instructions, you'll need to set up the default URL options for the Devise mailer in each environment. Here is a possible configuration for _config/environments/development.rb_:
+
+`config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }`
+
+=== Create the authenticated resource
+
+Create the User model:
+
+`rails generate devise User`
+
+=== Configure PostgreSQL
+
+In _Gemfile_, replace this line: `gem "sqlite3", "~> 1.4"` by this: `gem 'pg'`.
+
+And run `bundle install`
+
+In _config/database.yml_, replace the full content by this:
+
+```
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  username: <%= ENV['POSTGRES_USER'] %>
+  password: <%= ENV['POSTGRES_PASSWORD'] %>
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  timeout: 5000
+  host: <%= ENV['POSTGRES_HOST'] %>
+development:
+  <<: *default
+  database: <%= ENV['POSTGRES_DB'] %>
+test:
+  <<: *default
+  database: cryptr_rails_auth_test
+production:
+  <<: *default
+  database: <%= ENV['DATABASE_URL'] %>
+```
+
+Create a _.env_ file: `touch .env`
+
+Exclude this file in git: `echo ".env" >> .gitignore`
+
+In _.env_, add this content:
+
+```
+export POSTGRES_USER=postgres
+export POSTGRES_PASSWORD=postgres
+export POSTGRES_DB=cryptr_rails_regular_sample_dev
+```
+
+WARNING: Don't forget to replace the values of `POSTGRES_USER`, `POSTGRES_PASSWORD` and `POSTGRES_DB` with those that are appropriate for your environment.
+
+Source your environment : `source .env`
+
+Create the database: `rails db:create`
+
+Migrate the database: `rails db:migrate`
+
+In _db/seeds.rb_, add this content:
+
+```
+User.create({email: "bob@test.fr", password: "password"})
+```
+
+Seeding the database: `rails db:seed`
+
+=== Add Welcome page for authenticated users
+
+Create the _welcome_ controller:
+
+`touch app/controllers/welcome_controller.rb`
+
+And add this content:
+
+```
+class WelcomeController < ApplicationController
+  before_action :authenticate_user!
+
+  def index
+    @user = User.find session[:user_id] unless session[:user_id].nil?
+  end
+end
+```
+
+Create this files:
+
+- link:/app/views/welcome/index.html.erb[app/views/welcome/index.html.erb]
+- link:/app/views/devise/shared/_links.erb[app/views/devise/shared/_links.erb]
+
+In _config/routes.rb_:
+
+- define the root path with: `root 'welcome#index'`
+- replace `devise_for :users` by: `devise_for :users, controllers: { sessions: 'users/sessions' }`
+
+Create the file `app/controllers/users/sessions_controller.rb` to override the Devise session controller, and add this content:
+
+```
+class Users::SessionsController < Devise::SessionsController
+  def create
+    super
+
+    session[:user_id] = current_user&.id
+  end
+end
+```
