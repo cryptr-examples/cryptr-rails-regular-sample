@@ -1,0 +1,17 @@
+=== Step 1 : Create a new Ruby on Rails application
+
+First, generate a new regular Ruby on Rails application:
+
+`rails new cryptr-rails-regular-sample`
+
+And go to the _./cryptr-rails-regular-sample_ repository:
+
+`cd cryptr-rails-regular-sample`
+
+[TIP]
+.Starting the application
+====
+At this stage, you can already start your Rails application:
+
+`rails s`
+====
