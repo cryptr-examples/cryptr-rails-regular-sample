@@ -1,0 +1,37 @@
+== Step 3 : Use Redis cache layer to store user's sessions
+
+=== Configure Redis
+
+In your _Gemfile_, add:
+
+```
+gem 'redis'
+gem 'redis-rails'
+```
+
+and run `bundle install`.
+
+In _.env_, add this line (with the correct value for `REDIS_URL`):
+
+```
+export REDIS_URL=redis://localhost:6379
+```
+
+Create file _config/initializers/session_store.rb_ with this content:
+
+```
+Rails.application.config.session_store :redis_store,
+                                       servers: ["#{ENV['REDIS_URL']}/0/session"],
+                                       expire_after: 90.minutes,
+                                       key: '_cryptr_rails_regular_sample_session'
+```
+
+=== Run the application with Redis
+
+. In console, run `redis-server` to start your Redis server.
+. Run your Rails application in another console with `rails s`
+. Go-to http://localhost:3000/ and use seeding datas to sign-in with {email, password}.
+
+=> In your cookies, the `_cryptr_rails_regular_sample_session` entry contains the session ID (ex: `c5b4fe9d0a2cabadd1d3885d62d43521`)
+
+=== https://github.com/cryptr-examples/cryptr-rails-regular-sample/blob/step/04/docs/step-04.adoc[NEXT -> Step 4 : Configure Devise to use Cryptr SSO strategy (via Omniauth)]
