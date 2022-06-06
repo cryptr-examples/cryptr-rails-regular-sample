@@ -1,0 +1,19 @@
+=== Step 1 : Create a new Ruby on Rails application
+
+First, generate a new regular Ruby on Rails application:
+
+`rails new cryptr-rails-regular-sample`
+
+And go to the _./cryptr-rails-regular-sample_ repository:
+
+`cd cryptr-rails-regular-sample`
+
+[TIP]
+.Starting the application
+====
+At this stage, you can already start your Rails application:
+
+`rails s`
+====
+
+=== https://github.com/cryptr-examples/cryptr-rails-regular-sample/blob/step/02/docs/step-02.adoc[NEXT -> Step 2 : Use Devise to authenticate users with {login, password}]
