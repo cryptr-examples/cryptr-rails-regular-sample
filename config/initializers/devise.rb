@@ -272,6 +272,16 @@ Devise.setup do |config|
   # Add a new OmniAuth provider. Check the wiki for more information on setting
   # up on your models and hooks.
   # config.omniauth :github, 'APP_ID', 'APP_SECRET', scope: 'user,public_repo'
+  omniauth_client_options = Rails.env.development? || ENV['CRYPTR_SSL_VERIFY_MODE'] == 'VERIFY_NONE' ? { ssl: { verify_mode: OpenSSL::SSL::VERIFY_NONE } } : {}
+
+  config.omniauth :cryptr,
+                  authorize_params: { scope: ENV['CRYPTR_SCOPE'] },
+                  logout_path: '/users/sign_out',
+                  client_options: {
+                    site: ENV['CRYPTR_SITE_URL'],
+                    tenant: ENV['CRYPTR_TENANT']
+                  }.merge(omniauth_client_options),
+                  client_id: ENV['CRYPTR_CLIENT_ID']
 
   # ==> Warden configuration
   # If you want to use other strategies, that are not supported by Devise, or

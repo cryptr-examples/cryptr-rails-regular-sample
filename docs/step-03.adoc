@@ -33,3 +33,5 @@ Rails.application.config.session_store :redis_store,
 . Go-to http://localhost:3000/ and use seeding datas to sign-in with {email, password}.
 
 => In your cookies, the `_cryptr_rails_regular_sample_session` entry contains the session ID (ex: `c5b4fe9d0a2cabadd1d3885d62d43521`)
+
+=== https://github.com/cryptr-examples/cryptr-rails-regular-sample/blob/step/04/docs/step-04.adoc[NEXT -> Step 4 : Configure Devise to use Cryptr SSO strategy (via Omniauth)]

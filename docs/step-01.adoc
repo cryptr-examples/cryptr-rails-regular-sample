@@ -16,4 +16,4 @@ At this stage, you can already start your Rails application:
 `rails s`
 ====
 
-==== https://github.com/cryptr-examples/cryptr-rails-regular-sample/blob/step/02/docs/step-02.adoc[NEXT -> Step 2 : Use Devise to authenticate users with {login, password}]
+=== https://github.com/cryptr-examples/cryptr-rails-regular-sample/blob/step/02/docs/step-02.adoc[NEXT -> Step 2 : Use Devise to authenticate users with {login, password}]
