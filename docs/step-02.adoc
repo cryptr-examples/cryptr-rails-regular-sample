@@ -122,4 +122,4 @@ class Users::SessionsController < Devise::SessionsController
 end
 ```
 
-==== https://github.com/cryptr-examples/cryptr-rails-regular-sample/blob/step/03/docs/step-03.adoc[NEXT -> Step 3 : Use Redis cache layer to store user’s sessions]
+=== https://github.com/cryptr-examples/cryptr-rails-regular-sample/blob/step/03/docs/step-03.adoc[NEXT -> Step 3 : Use Redis cache layer to store user’s sessions]
