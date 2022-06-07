@@ -1,0 +1,193 @@
+== Step 4 : Configure Devise to use Cryptr SSO strategy (via Omniauth)
+
+In your _Gemfile_, add:
+
+```
+gem 'omniauth'
+gem 'omniauth-rails_csrf_protection'
+gem 'omniauth-cryptr', git: 'https://github.com/cryptr-auth/omniauth-cryptr.git', branch: 'develop'
+```
+
+[NOTE] 
+.omniauth-cryptr version
+==== 
+All JWT validations will be implemented at the end of June 2022. Until then, you must use the `develop` branch. This implementation will not change the integration of the gem `omniauth-cryptr` in your project.
+====
+
+and run `bundle install`.
+
+In _config/initializers/devise.rb_, add this configuration:
+
+```
+  omniauth_client_options = Rails.env.development? || ENV['CRYPTR_SSL_VERIFY_MODE'] == 'VERIFY_NONE' ? { ssl: { verify_mode: OpenSSL::SSL::VERIFY_NONE } } : {}
+
+  # ==> OmniAuth
+  # Add a new OmniAuth provider. Check the wiki for more information on setting
+  # up on your models and hooks.
+  # config.omniauth :github, 'APP_ID', 'APP_SECRET', scope: 'user,public_repo'
+  config.omniauth :cryptr,
+                  authorize_params: { scope: ENV['CRYPTR_SCOPE'] },
+                  logout_path: '/users/sign_out',
+                  client_options: {
+                    site: ENV['CRYPTR_SITE_URL'],
+                    tenant: ENV['CRYPTR_TENANT']
+                  }.merge(omniauth_client_options),
+                  client_id: ENV['CRYPTR_CLIENT_ID']
+```
+
+In _.env_, add this content:
+
+```
+export CRYPTR_CLIENT_ID=00000000-0000-0000-0000-000000000000
+export CRYPTR_IDP_IDS=""
+export CRYPTR_SCOPE="openid profile email"
+export CRYPTR_SITE_URL=https://cleeck-umbrella-develop.onrender.com
+export CRYPTR_SSL_VERIFY_MODE=VERIFY_NONE
+export CRYPTR_TENANT=my-tenant
+```
+
+WARNING: Don't forget to replace the values of `CRYPTR_CLIENT_ID`, `CRYPTR_IDP_IDS`, `CRYPTR_SCOPE`, `CRYPTR_SITE_URL`, `CRYPTR_SSL_VERIFY_MODE` and `CRYPTR_TENANT` with those that are appropriate for your environment.
+
+Source your environment : `source .env`
+
+Create a migration to store SSO datas to the User: `rails g migration add_omniauth_data_to_users provider uid tenant`
+
+Run this migration: `rails db:migrate`
+
+In _app/models/user.rb_:
+
+ - configure `devise` with `omniauthable`. Add `:omniauthable, omniauth_providers: [:cryptr]` :
+
+```
+devise :database_authenticatable, :registerable,
+       :recoverable, :rememberable, :validatable,
+       :omniauthable, omniauth_providers: [:cryptr]
+```
+
+ - add this function:
+
+```
+def self.from_omniauth(provider_data)
+  where(
+    tenant: provider_data.extra.raw_info.tnt,
+    provider: provider_data.provider,
+    uid: provider_data.uid
+  ).first_or_create  do |user|
+    user.email = provider_data.info.email
+    user.password = Devise.friendly_token[0, 20]
+  end
+end
+```
+
+[NOTE] 
+.self.from_omniauth(provider_data)...
+==== 
+This is a possible implementation of this function. The strategy will depend on your needs.
+====
+
+In _config/routes.rb_, replace:
+
+```
+devise_for :users, controllers: { sessions: 'users/sessions' }
+```
+
+by:
+
+```
+devise_for :users, controllers: {
+  omniauth_callbacks: 'users/omniauth_callbacks',
+  sessions: 'users/sessions'
+}
+
+devise_scope :user do
+  get '/users/slo/logout', to: 'users/sessions#slo_logout'
+end
+```
+
+Replace the content of the controller _app/controllers/users/sessions_controller.rb_ with this:
+
+```
+class Users::SessionsController < Devise::SessionsController
+  protect_from_forgery with: :null_session, only: :create
+
+  def new
+    @idp_ids = request.query_parameters[:idp_ids] || ENV['CRYPTR_IDP_IDS'].split(' ')
+
+    super
+  end
+
+  def create
+    super
+
+    session[:user_id] = current_user&.id
+  end
+
+  def destroy
+    slo_url = session.delete('omniauth.slo_url')
+
+    if slo_url
+      uri =  URI.parse(slo_url)
+      target_url = request.protocol + request.host_with_port + after_sign_out_path_for(resource_name)
+      new_query_ar = URI.decode_www_form(String(uri.query)) << ['target_url', target_url]
+      uri.query = URI.encode_www_form(new_query_ar)
+      slo_url = uri.to_s
+    end
+
+    super do
+      session['omniauth.slo_url'] = slo_url if slo_url
+    end
+  end
+
+  def slo_logout
+    slo_url = session['omniauth.slo_url']
+
+    if slo_url
+      redirect_to slo_url, allow_other_host: true
+    else
+      redirect_to after_sign_out_path_for(resource_name)
+    end
+  end
+
+  def after_sign_out_path_for(_)
+    if session['omniauth.slo_url']
+      '/users/slo/logout'
+    else
+      super
+    end
+  end
+end
+```
+
+Create controller _app/controllers/users/omniauth_callbacks_controller.rb_ with this content:
+
+```
+class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
+  def cryptr
+    handle_auth "Cryptr"
+  end
+
+  def handle_auth(kind)
+    user_info = request.env['omniauth.auth']
+    @user = User.from_omniauth(user_info)
+
+    if @user.persisted?
+      session[:user_id] = @user.id
+      session[:access_token] = user_info['credentials']['token']
+
+      flash[:notice] = I18n.t "devise.omniauth_callbacks.success", kind: kind
+      sign_in_and_redirect @user, event: :authentication
+    else
+      session["devise.auth_data"] = request.env["omniauth.auth"].except(:extra)
+      redirect_to new_user_registration_url, alert: @user.errors.full_messages.join("\n")
+    end
+  end
+
+  def failure
+    redirect_to root_path, alert: "Failure. Please try again"
+  end
+end
+```
+
+It’s done! You can now start the application.
+
+Congratulations if you made it to the end! I hope this was helpful, and thanks for reading!

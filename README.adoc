@@ -17,3 +17,7 @@
 === https://github.com/cryptr-examples/cryptr-rails-regular-sample/blob/step/01/docs/step-01.adoc[Step 1 : Create a new Ruby on Rails application]
 
 === https://github.com/cryptr-examples/cryptr-rails-regular-sample/blob/step/02/docs/step-02.adoc[Step 2 : Use Devise to authenticate users with {login, password}]
+
+==== https://github.com/cryptr-examples/cryptr-rails-regular-sample/blob/step/03/docs/step-03.adoc[Step 3 : Use Redis cache layer to store user’s sessions]
+
+==== https://github.com/cryptr-examples/cryptr-rails-regular-sample/blob/step/04/docs/step-04.adoc[Step 4 : Configure Devise to use Cryptr SSO strategy (via Omniauth)]
