@@ -2,6 +2,9 @@
 # exit on error
 set -o errexit
 
+echo "🔒️ unset frozen"
+bundle config unset frozen
+
 echo "🧪 lock to linux bundle"
 bundle lock --add-platform ruby
 bundle lock --add-platform x86_64-linux
