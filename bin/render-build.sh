@@ -4,7 +4,10 @@ set -o errexit
 
 echo "🔒️ unset frozen and deployment"
 bundle config unset frozen
-bundle config unset deployment   
+bundle config unset deployment
+
+echo "➖ remove lockfile"
+rm -rf Gemfile.lock
 
 echo "🧪 lock to linux bundle"
 bundle lock --add-platform ruby
