@@ -2,14 +2,14 @@
 # exit on error
 set -o errexit
 
-echo "🔒️ unset frozen and deployment"
-bundle config unset frozen
-bundle config unset deployment
+# echo "🔒️ unset frozen and deployment"
+# bundle config unset frozen
+# bundle config unset deployment
 
-echo "🧪 lock to linux bundle"
-bundle lock --add-platform ruby
-bundle lock --add-platform x86_64-linux
-bundle lock --remove-platform arm64-darwin-21
+# echo "🧪 lock to linux bundle"
+# bundle lock --add-platform ruby
+# bundle lock --add-platform x86_64-linux
+# bundle lock --remove-platform arm64-darwin-21
 
 echo "🚀 start bundle install and other rake exec"
 bundle install
