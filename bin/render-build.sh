@@ -2,8 +2,9 @@
 # exit on error
 set -o errexit
 
-echo "🔒️ unset frozen"
+echo "🔒️ unset frozen and deployment"
 bundle config unset frozen
+bundle config unset deployment   
 
 echo "🧪 lock to linux bundle"
 bundle lock --add-platform ruby
