@@ -9,7 +9,7 @@
   <br />
   
   <% @idp_ids.each do |idp_id| %>    
-    <%= form_tag user_cryptr_omniauth_authorize_path(), method: :post, data: {turbo: false} do %>
+    <%= form_tag user_cryptr_omniauth_authorize_path(idp_id: idp_id), method: :post, data: {turbo: false} do %>
       <%# hidden_field_tag :idp_id, idp_id %>
       <button type='submit'>Sign-in with Cryptr SSO [idp_id: <%= idp_id %>]</button>
     <% end %>
