@@ -1,7 +1,7 @@
 <%- if devise_mapping.omniauthable? && controller_name != 'passwords' && controller_name != 'registrations' %>
   <br />
 
-  <%= form_tag omniauth_authorize_path(resource_name, :cryptr), method: :post, data: {turbo: false} do %>
+  <%= form_tag user_cryptr_omniauth_authorize_path(), method: :post, data: {turbo: false} do %>
     <%= hidden_field_tag :locale, I18n.locale %>
     <%= hidden_field_tag :sign_type, 'signin' %>
     <button type='submit'>Sign-in with Cryptr Magic Link</button>
@@ -9,7 +9,7 @@
   <br />
   
   <% @idp_ids.each do |idp_id| %>    
-    <%= form_tag omniauth_authorize_path(resource_name, :cryptr), method: :post, data: {turbo: false} do %>
+    <%= form_tag user_cryptr_omniauth_authorize_path(), method: :post, data: {turbo: false} do %>
       <%= hidden_field_tag :idp_id, idp_id %>
       <button type='submit'>Sign-in with Cryptr SSO [idp_id: <%= idp_id %>]</button>
     <% end %>
@@ -20,7 +20,7 @@
 <%- if devise_mapping.omniauthable? && devise_mapping.registerable? && controller_name == 'registrations' %>
   <br />
 
-  <%= form_tag omniauth_authorize_path(resource_name, :cryptr), method: :post, data: {turbo: false} do %>
+  <%= form_tag user_cryptr_omniauth_authorize_path(), method: :post, data: {turbo: false} do %>
     <%= hidden_field_tag :locale, I18n.locale %>
     <%= hidden_field_tag :sign_type, 'signup' %>
     <button type='submit'>Sign-up with Cryptr Magic Link</button>
