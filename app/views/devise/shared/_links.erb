@@ -8,12 +8,30 @@
   <% end %>
   <br />
   
-  <% @idp_ids.each do |idp_id| %>    
-    <%= form_tag user_cryptr_omniauth_authorize_path(), method: :post, data: {turbo: false} do %>
-      <%= hidden_field_tag :idp_id, idp_id %>
-      <button type='submit'>Sign-in with Cryptr SSO [idp_id: <%= idp_id %>]</button>
+  <%= form_tag user_cryptr_omniauth_authorize_path(), method: :post, data: {turbo: false} do |f| %>
+    <%= hidden_field_tag :sign_type, 'sso' %>
+    <%= hidden_field_tag :locale, 'fr' %>
+
+    <% @idp_ids.each do |idp_id| %>
+      <%= hidden_field_tag 'idp_ids[]', idp_id %>
     <% end %>
+
+    <button type='submit'>Me connecter avec Cryptr SSO Gateway [FR]</button>
   <% end %>
+
+  <br />
+
+  <%= form_tag user_cryptr_omniauth_authorize_path(), method: :post, data: {turbo: false} do |f| %>
+    <%= hidden_field_tag :sign_type, 'sso' %>
+    <%= hidden_field_tag :locale, I18n.locale %>
+
+    <% @idp_ids.each do |idp_id| %>
+      <%= hidden_field_tag 'idp_ids[]', idp_id %>
+    <% end %>
+
+    <button type='submit'>Sign-in with Cryptr SSO Gateway [<%= I18n.locale.upcase %>]</button>
+  <% end %>
+
   <br />
 <% end %>
 
