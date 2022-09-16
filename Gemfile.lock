@@ -1,9 +1,9 @@
 GIT
   remote: https://github.com/cryptr-auth/omniauth-cryptr.git
-  revision: aac84db2248b85c1063d708c3a11686509b2b95c
+  revision: 811c72263406e8c9749aac150efba8c92a7a09fe
   branch: develop
   specs:
-    omniauth-cryptr (0.1.3)
+    omniauth-cryptr (0.1.4)
       omniauth (~> 2.0)
       omniauth-oauth2 (~> 1.7)
 
