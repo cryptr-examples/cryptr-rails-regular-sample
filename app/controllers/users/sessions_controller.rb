@@ -1,12 +1,6 @@
 class Users::SessionsController < Devise::SessionsController
   protect_from_forgery with: :null_session, only: :create
 
-  def new
-    @idp_ids = request.query_parameters[:idp_ids] || ENV['CRYPTR_IDP_IDS'].split(' ')
-
-    super
-  end
-
   def create
     super
 
@@ -15,6 +9,7 @@ class Users::SessionsController < Devise::SessionsController
 
   def destroy
     slo_url = session.delete('omniauth.slo_url')
+    session.delete(:user_id)
 
     if slo_url
       uri =  URI.parse(slo_url)
