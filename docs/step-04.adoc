@@ -5,7 +5,7 @@ In your _Gemfile_, add:
 ```
 gem 'omniauth'
 gem 'omniauth-rails_csrf_protection'
-gem 'omniauth-cryptr', git: 'https://github.com/cryptr-auth/omniauth-cryptr.git', branch: 'develop'
+gem 'omniauth-cryptr', git: 'https://github.com/cryptr-auth/omniauth-cryptr.git'
 ```
 
 [NOTE] 
@@ -39,14 +39,13 @@ In _.env_, add this content:
 
 ```
 export CRYPTR_CLIENT_ID=00000000-0000-0000-0000-000000000000
-export CRYPTR_IDP_IDS=""
 export CRYPTR_SCOPE="openid profile email"
 export CRYPTR_SITE_URL=https://cleeck-umbrella-develop.onrender.com
 export CRYPTR_SSL_VERIFY_MODE=VERIFY_NONE
 export CRYPTR_TENANT=my-tenant
 ```
 
-WARNING: Don't forget to replace the values of `CRYPTR_CLIENT_ID`, `CRYPTR_IDP_IDS`, `CRYPTR_SCOPE`, `CRYPTR_SITE_URL`, `CRYPTR_SSL_VERIFY_MODE` and `CRYPTR_TENANT` with those that are appropriate for your environment.
+WARNING: Don't forget to replace the values of `CRYPTR_CLIENT_ID`, `CRYPTR_SCOPE`, `CRYPTR_SITE_URL`, `CRYPTR_SSL_VERIFY_MODE` and `CRYPTR_TENANT` with those that are appropriate for your environment.
 
 Source your environment : `source .env`
 
@@ -110,12 +109,6 @@ Replace the content of the controller _app/controllers/users/sessions_controller
 class Users::SessionsController < Devise::SessionsController
   protect_from_forgery with: :null_session, only: :create
 
-  def new
-    @idp_ids = request.query_parameters[:idp_ids] || ENV['CRYPTR_IDP_IDS'].split(' ')
-
-    super
-  end
-
   def create
     super
 
@@ -123,6 +116,7 @@ class Users::SessionsController < Devise::SessionsController
   end
 
   def destroy
+    session.delete(:user_id)
     slo_url = session.delete('omniauth.slo_url')
 
     if slo_url
