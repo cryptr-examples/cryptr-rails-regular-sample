@@ -3,33 +3,22 @@
 
   <%= form_tag user_cryptr_omniauth_authorize_path(), method: :post, data: {turbo: false} do %>
     <%= hidden_field_tag :locale, I18n.locale %>
-    <%= hidden_field_tag :sign_type, 'signin' %>
     <button type='submit'>Sign-in with Cryptr Magic Link</button>
   <% end %>
   <br />
   
-  <%= form_tag user_cryptr_omniauth_authorize_path(), method: :post, data: {turbo: false} do |f| %>
-    <%= hidden_field_tag :sign_type, 'sso' %>
-    <%= hidden_field_tag :locale, 'fr' %>
-
-    <% @idp_ids.each do |idp_id| %>
-      <%= hidden_field_tag 'idp_ids[]', idp_id %>
-    <% end %>
-
-    <button type='submit'>Me connecter avec Cryptr SSO Gateway [FR]</button>
+  <%= form_tag omniauth_authorize_path(resource_name, :cryptr), method: :post, data: {turbo: false} do %>
+    <%= hidden_field_tag :locale, I18n.locale %>
+    <%= email_field_tag :email %>
+    <button type='submit'>Sign-in with Cryptr SSO [email]</button>
   <% end %>
 
   <br />
 
-  <%= form_tag user_cryptr_omniauth_authorize_path(), method: :post, data: {turbo: false} do |f| %>
-    <%= hidden_field_tag :sign_type, 'sso' %>
+  <%= form_tag omniauth_authorize_path(resource_name, :cryptr), method: :post, data: {turbo: false} do %>
     <%= hidden_field_tag :locale, I18n.locale %>
-
-    <% @idp_ids.each do |idp_id| %>
-      <%= hidden_field_tag 'idp_ids[]', idp_id %>
-    <% end %>
-
-    <button type='submit'>Sign-in with Cryptr SSO Gateway [<%= I18n.locale.upcase %>]</button>
+    <%= text_field_tag :org_domain %>
+    <button type='submit'>Sign-in with Cryptr SSO [org_domain]</button>
   <% end %>
 
   <br />
@@ -40,7 +29,6 @@
 
   <%= form_tag user_cryptr_omniauth_authorize_path(), method: :post, data: {turbo: false} do %>
     <%= hidden_field_tag :locale, I18n.locale %>
-    <%= hidden_field_tag :sign_type, 'signup' %>
     <button type='submit'>Sign-up with Cryptr Magic Link</button>
   <% end %>
   <br />

@@ -1,12 +1,6 @@
 class Users::SessionsController < Devise::SessionsController
   protect_from_forgery with: :null_session, only: :create
 
-  def new
-    @idp_ids = request.query_parameters[:idp_ids] || ENV['CRYPTR_IDP_IDS'].split(' ')
-
-    super
-  end
-
   def create
     super
 
@@ -14,6 +8,7 @@ class Users::SessionsController < Devise::SessionsController
   end
 
   def destroy
+    session.delete(:user_id)
     slo_url = session.delete('omniauth.slo_url')
 
     if slo_url
@@ -30,7 +25,7 @@ class Users::SessionsController < Devise::SessionsController
   end
 
   def slo_logout
-    slo_url = session['omniauth.slo_url']
+    slo_url = session.delete('omniauth.slo_url')
 
     if slo_url
       redirect_to slo_url, allow_other_host: true
